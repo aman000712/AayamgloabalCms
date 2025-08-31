@@ -1,196 +1,137 @@
-import React, { useEffect } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import React, { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import AddBlogValidationSchema from "../../../validations/AddBlogValidation";
+import ReactHookTextInput from "../../react-hook-form/ReactHookTextInput";
+import ReactHookTextArea from "../../react-hook-form/ReactHookTextArea";
+import ReactHookSelectInput from "../../react-hook-form/ReactHookSelectInput";
+import ReactHookDateInput from "../../react-hook-form/ReactHookDatePicker";
+import ReactHookImageInput from "../../react-hook-form/ImageUploader";
+import { Button } from "@mantine/core";
 
 const AddBlog = ({ onAdd, onCancel }) => {
-    const initialValues = {
-        title: '',
-        content: '',
-        excerpt: '',
-        category: '',
-        author: '',
-        date: '',
-        image: null,
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const defaultValues = {
+    title: "",
+    content: "",
+    except: "",
+    category: "",
+    author: "",
+    date: "",
+    image: null,
+  };
+
+  const methods = useForm({
+    resolver: yupResolver(AddBlogValidationSchema),
+    defaultValues,
+  });
+
+  const {
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = methods;
+
+  const categories = JSON.parse(localStorage.getItem("categories")) || [
+    "Kitchen Arts",
+    "Field Visit",
+    "Housekeeping",
+    "General Accounting",
+  ];
+
+  const handleImageChange = (file) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image must be <2MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+      setValue("image", reader.result);
     };
+    reader.readAsDataURL(file);
+  };
 
-    const validationSchema = Yup.object({
-        title: Yup.string().required('Title is required'),
-        content: Yup.string().required('Content is required'),
-        excerpt: Yup.string().max(150, 'Excerpt must be at most 150 characters'),
-        category: Yup.string().required('Category is required'),
-        author: Yup.string().required('Author is required'),
-        date: Yup.date().required('Date is required'),
-    });
-
-    const categories = JSON.parse(localStorage.getItem('categories')) || [
-        'Kitchen Arts',
-        'Field Visit',
-        'Housekeeping',
-        'General Accounting',
-    ];
-
-    const onSubmit = (values, { resetForm }) => {
-        if (values.image) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const blogWithImage = { ...values, image: reader.result };
-                saveBlog(blogWithImage);
-                resetForm();
-            };
-            reader.readAsDataURL(values.image);
-        } else {
-            saveBlog(values);
-            resetForm();
-        }
+  const saveBlog = (values) => {
+    const newBlog = {
+      ...values,
+      image:
+        values.image || "https://via.placeholder.com/150x150.png?text=Blog",
     };
+    onAdd?.(newBlog);
+    reset();
+    setImagePreview(null);
+  };
 
-    const saveBlog = (blog) => {
-        const savedBlogs = JSON.parse(localStorage.getItem('blogs')) || [];
-        const updatedBlogs = [blog, ...savedBlogs];
-        localStorage.setItem('blogs', JSON.stringify(updatedBlogs));
-        onAdd(blog);
-    };
+  return (
+    <div className="bg-white p-8 md:p-12 rounded-3xl shadow-lg max-w-6xl mx-auto transition-all duration-300">
+      <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center md:text-left">
+        Add New Blog
+      </h2>
+      <FormProvider {...methods}>
+        <form
+          onSubmit={handleSubmit(saveBlog)}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
+          <ReactHookTextInput
+            errors={errors}
+            name="title"
+            label="Title"
+            placeholder="Enter Title"
+          />
+          <ReactHookSelectInput
+            name="category"
+            label="Category"
+            options={categories}
+          />
+          <ReactHookTextInput
+            errors={errors}
+            name="author"
+            label="Author"
+            placeholder="Enter Author"
+          />
+          <ReactHookDateInput name="date" label="Date" />
+          <ReactHookTextArea
+            errors={errors}
+            name="except"
+            label="Excerpt"
+            placeholder="Brief description..."
+          />
+          <ReactHookTextArea
+            errors={errors}
+            name="content"
+            label="Content"
+            placeholder="Full content..."
+          />
+          <ReactHookImageInput
+            name="image"
+            label="Blog Image"
+            imagePreview={imagePreview}
+            setImagePreview={setImagePreview}
+            handleImageChange={(e) => handleImageChange(e.target.files[0])}
+          />
+          <div className="md:col-span-2 flex justify-end gap-6 mt-6">
+            <Button
+              label="Cancel"
+              type="button"
+              onClick={onCancel}
+              className="px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 shadow"
+            />
 
-    return (
-        <div className="bg-white p-8 rounded-2xl shadow-md max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Add New Blog</h2>
-            <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={onSubmit}
-            >
-                {({ setFieldValue, isSubmitting }) => (
-                    <Form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                        <div>
-                            <label htmlFor="title" className="block text-gray-700 mb-2 font-medium">
-                                Title
-                            </label>
-                            <Field
-                                type="text"
-                                id="title"
-                                name="title"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <ErrorMessage name="title" component="div" className="text-red-500 text-sm mt-1" />
-                        </div>
-
-
-                        <div>
-                            <label htmlFor="category" className="block text-gray-700 mb-2 font-medium">
-                                Category
-                            </label>
-                            <Field
-                                as="select"
-                                id="category"
-                                name="category"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="">Select a category</option>
-                                {categories.map((cat) => (
-                                    <option key={cat} value={cat}>
-                                        {cat}
-                                    </option>
-                                ))}
-                            </Field>
-                            <ErrorMessage name="category" component="div" className="text-red-500 text-sm mt-1" />
-                        </div>
-
-
-                        <div>
-                            <label htmlFor="author" className="block text-gray-700 mb-2 font-medium">
-                                Author
-                            </label>
-                            <Field
-                                type="text"
-                                id="author"
-                                name="author"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <ErrorMessage name="author" component="div" className="text-red-500 text-sm mt-1" />
-                        </div>
-
-
-                        <div>
-                            <label htmlFor="date" className="block text-gray-700 mb-2 font-medium">
-                                Date
-                            </label>
-                            <Field
-                                type="date"
-                                id="date"
-                                name="date"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <ErrorMessage name="date" component="div" className="text-red-500 text-sm mt-1" />
-                        </div>
-
-
-                        <div className="md:col-span-2">
-                            <label htmlFor="excerpt" className="block text-gray-700 mb-2 font-medium">
-                                Excerpt (Max 150 characters)
-                            </label>
-                            <Field
-                                as="textarea"
-                                id="excerpt"
-                                name="excerpt"
-                                rows="3"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <ErrorMessage name="excerpt" component="div" className="text-red-500 text-sm mt-1" />
-                        </div>
-
-
-                        <div className="md:col-span-2">
-                            <label htmlFor="content" className="block text-gray-700 mb-2 font-medium">
-                                Content
-                            </label>
-                            <Field
-                                as="textarea"
-                                id="content"
-                                name="content"
-                                rows="6"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <ErrorMessage name="content" component="div" className="text-red-500 text-sm mt-1" />
-                        </div>
-
-
-                        <div className="md:col-span-2">
-                            <label htmlFor="image" className="block text-gray-700 mb-2 font-medium">
-                                Image
-                            </label>
-                            <input
-                                type="file"
-                                id="image"
-                                name="image"
-                                accept="image/*"
-                                onChange={(event) => setFieldValue('image', event.currentTarget.files[0])}
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-
-                        <div className="md:col-span-2 flex justify-end gap-4 mt-4">
-                            <button
-                                type="button"
-                                onClick={onCancel}
-                                className="px-5 py-2 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="px-5 py-2 bg-[rgb(191,23,23)]  text-white rounded-xl hover:bg-red-800 transition-colors"
-                            >
-                                Add Blog
-                            </button>
-                        </div>
-                    </Form>
-                )}
-            </Formik>
-        </div>
-    );
+            <Button
+              type="submit"
+              label="Add Blog"
+              disabled={isSubmitting}
+              className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 shadow"
+            />
+          </div>
+        </form>
+      </FormProvider>
+    </div>
+  );
 };
 
 export default AddBlog;

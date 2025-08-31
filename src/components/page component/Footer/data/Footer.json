@@ -1,0 +1,26 @@
+{
+  "logoUrl": "/logo.png",
+  "description": "Discover the world of knowledge with top-class education at Abhyam Academy.",
+  "newsletterText": "Subscribe to Newsletter",
+  "resources": [
+    { "title": "Scholarships", "url": "/scholarships" },
+    { "title": "How to apply", "url": "/how-to-apply" }
+  ],
+  "quickLinks": [
+    { "title": "Home", "url": "/" },
+    { "title": "Courses", "url": "/courses" }
+  ],
+  "legalLinks": [
+    { "title": "Terms of Service", "url": "/terms" },
+    { "title": "Privacy Policy", "url": "/privacy" }
+  ],
+  "contact": {
+    "email": "info@aayamglobal.com",
+    "address": "Tilottama-2, Janakinagar",
+    "phone": "071553777"
+  },
+  "socialLinks": [
+    { "platform": "facebook", "url": "https://facebook.com" },
+    { "platform": "twitter", "url": "https://twitter.com" }
+  ]
+}

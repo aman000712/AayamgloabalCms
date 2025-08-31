@@ -3,36 +3,42 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 export const ContainerAbout = ({ sectionName, initialData, onSubmit, onCancel }) => {
+  // Load from localStorage
+  const savedData = JSON.parse(localStorage.getItem("containerAboutData")) || {};
+
   const formik = useFormik({
     initialValues: {
-      bannerTitle: initialData?.title || "",
-      bannerDescription: initialData?.description || "",
+      bannerTitle: savedData.title || initialData?.title || "",
+      bannerDescription: savedData.description || initialData?.description || "",
       bannerImage: null,
-      imageUrl: initialData?.imageUrl || ""
+      imageUrl: savedData.imageUrl || initialData?.imageUrl || ""
     },
     validationSchema: Yup.object({
       bannerTitle: Yup.string().required("Title is required"),
       bannerDescription: Yup.string().required("Description is required"),
     }),
     onSubmit: (values) => {
-      const imageUrl = values.bannerImage instanceof File
-        ? URL.createObjectURL(values.bannerImage)
-        : values.imageUrl;
-
-      onSubmit({
+      const finalData = {
         title: values.bannerTitle,
         description: values.bannerDescription,
-        imageUrl: imageUrl
-      });
+        imageUrl: values.imageUrl, // already Base64
+      };
+
+      // Save to localStorage
+      localStorage.setItem("containerAboutData", JSON.stringify(finalData));
+
+      onSubmit(finalData);
     },
   });
 
+  // Convert image to Base64 when uploaded
   useEffect(() => {
     if (formik.values.bannerImage instanceof File) {
-      const objectUrl = URL.createObjectURL(formik.values.bannerImage);
-      formik.setFieldValue('imageUrl', objectUrl);
-
-      return () => URL.revokeObjectURL(objectUrl);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        formik.setFieldValue("imageUrl", reader.result); // Base64 string
+      };
+      reader.readAsDataURL(formik.values.bannerImage);
     }
   }, [formik.values.bannerImage]);
 
@@ -48,6 +54,7 @@ export const ContainerAbout = ({ sectionName, initialData, onSubmit, onCancel })
         </div>
 
         <form onSubmit={formik.handleSubmit} className="space-y-6">
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Title <span className="text-red-500">*</span>
@@ -70,6 +77,7 @@ export const ContainerAbout = ({ sectionName, initialData, onSubmit, onCancel })
             )}
           </div>
 
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description <span className="text-red-500">*</span>
@@ -92,6 +100,7 @@ export const ContainerAbout = ({ sectionName, initialData, onSubmit, onCancel })
             )}
           </div>
 
+          {/* Image */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Image <span className="text-red-500">*</span>
@@ -99,6 +108,7 @@ export const ContainerAbout = ({ sectionName, initialData, onSubmit, onCancel })
             <input
               type="file"
               name="bannerImage"
+              accept="image/*"
               onChange={(event) => {
                 formik.setFieldValue("bannerImage", event.currentTarget.files[0]);
               }}
@@ -118,7 +128,7 @@ export const ContainerAbout = ({ sectionName, initialData, onSubmit, onCancel })
               <div className="mt-4">
                 <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
                 <img
-                  src={formik.values.imageUrl || initialData.imageUrl}
+                  src={formik.values.imageUrl || initialData?.imageUrl}
                   alt="Preview"
                   className="h-40 w-full object-contain border rounded"
                 />
@@ -126,6 +136,7 @@ export const ContainerAbout = ({ sectionName, initialData, onSubmit, onCancel })
             )}
           </div>
 
+          {/* Buttons */}
           <div className="flex space-x-4">
             <button
               type="button"

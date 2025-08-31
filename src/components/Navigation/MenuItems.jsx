@@ -1,71 +1,74 @@
-
 import {
-    FiAward, FiBookOpen, FiCalendar, FiChrome, FiClipboard,
-    FiFileText, FiHome, FiImage, FiInfo, FiLink, FiUser,
-    FiUserCheck, FiUserPlus, FiUsers, FiVoicemail
+  FiAward,
+  FiBookOpen,
+  FiCalendar,
+  FiChrome,
+  FiClipboard,
+  FiFileText,
+  FiHome,
+  FiImage,
+  FiInfo,
+  FiLink,
+  FiUser,
+  FiUserCheck,
+  FiUserPlus,
+  FiUsers,
+  FiVoicemail,
 } from "react-icons/fi";
 
 export const menuItems = [
-    {
-        name: "Home",
-        path: "/",
-        icon: <FiHome size={18} />
-    },
-    {
-        name: "About",
-        path: "/about",
-        icon: <FiInfo
-            size={18} />
-    },
-    {
-        name: "Courses",
-        path: "/courses",
-        icon: <FiBookOpen size={18} />
-    },
-    {
-        name: "Our Principle",
-        path: "/our-principle",
-        icon: <FiAward size={18} />
-    },
+  {
+    name: "Home",
+    path: "/",
+    icon: <FiHome size={18} />,
+  },
+  {
+    name: "About",
+    path: "/about",
+    icon: <FiInfo size={18} />,
+  },
+  {
+    name: "Courses",
+    path: "/courses",
+    icon: <FiBookOpen size={18} />,
+  },
 
-    {
-        name: "Our Faculty",
-        path: "/our-faculty",
-        icon: <FiUserCheck size={18} />
-    },
+  {
+    name: "Events",
 
-    {
-        name: "Gallery",
-        path: "/gallery",
+    path: "/events",
+    icon: <FiCalendar size={18} />,
+  },
 
-        icon: <FiImage size={18} />
-    },
-    {
-        name: "Events",
+  {
+    name: "Blogs",
+    path: "/blogs",
+    icon: <FiFileText size={18} />,
+  },
 
-        path: "/events",
-        icon: <FiCalendar size={18} />
-    },
-
-    {
-        name: "Blogs",
-        path: "/blogs",
-        icon: <FiFileText size={18} />
-    },
-
-    {
-        name: "Team",
-        path: "/team",
-        icon: <FiChrome size={18} />
-    },
-    {
-        name: "ContactUs",
-        path: "/contactus",
-        icon: <FiVoicemail size={18} />
-    },
-    {
-        name: "UsefulLinks",
-        path: "/usefullinks",
-        icon: <FiLink size={18} />
-    },
+  {
+    name: "Team",
+    path: "/team",
+    icon: <FiChrome size={18} />,
+  },
+  {
+    name: "ContactUs",
+    path: "/contactus",
+    icon: <FiVoicemail size={18} />,
+  },
+  {
+    name: "PageSection",
+    path: "/pagesection",
+    icon: <FiVoicemail size={18} />,
+  },
+  {
+    name: "UsefulLinks",
+    path: "/usefullinks",
+    icon: <FiLink size={18} />,
+  },
+  {
+    name: "Footer",
+    path: "/footer",
+    icon: <FiAward size={18} />,
+  },
 ];

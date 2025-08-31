@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import TeamTable from "../page component/TeamTable";
+import TeamTable from "../page component/Team/TeamTable";
 import AddTeamMember from "../page component/Team/AddTeamMember";
 import EditTeamMember from "../page component/Team/EditTeamMember";
 import DeleteTeamMember from "../page component/Team/DeleteTeamMember";
@@ -17,7 +17,7 @@ const Team = () => {
         if (stored) setTeamMembers(JSON.parse(stored));
     }, []);
 
-    // Save to localStorage
+
     useEffect(() => {
         localStorage.setItem("teamMembers", JSON.stringify(teamMembers));
     }, [teamMembers]);
